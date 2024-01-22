@@ -14,7 +14,7 @@
     "@typechain/hardhat": "^7.0.0",
     "chai": "^4.3.7",
     "ethers": "5.4.7",
-    "hardhat": "^2.14.0",
+    "hardhat": "^2.19.4",
     "hardhat-gas-reporter": "^1.0.9",
     "solidity-coverage": "^0.8.2",
     "typechain": "^8.2.0"
