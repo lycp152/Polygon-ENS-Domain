@@ -1,15 +1,37 @@
-// useStateを追加でインポートしています。
 import React, { useEffect, useState } from "react";
 import "./styles/App.css";
 import twitterLogo from "./assets/twitter-logo.svg";
 import catGif from "./assets/cat.gif";
 
+// 定数
 const TWITTER_HANDLE = "UNCHAIN_tech";
 const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
 
 const App = () => {
-  //ユーザーのウォレットアドレスをstate管理しています。冒頭のuseStateのインポートを忘れないでください。
   const [currentAccount, setCurrentAccount] = useState("");
+
+  // connectWallet 関数を定義
+  const connectWallet = async () => {
+    try {
+      const { ethereum } = window;
+
+      if (!ethereum) {
+        alert("Get MetaMask -> https://metamask.io/");
+        return;
+      }
+
+      // アカウントへのアクセスを要求するメソッドを使用します。
+      const accounts = await ethereum.request({
+        method: "eth_requestAccounts",
+      });
+
+      // Metamask を一度認証すれば Connected とコンソールに表示されます。
+      console.log("Connected", accounts[0]);
+      setCurrentAccount(accounts[0]);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const checkIfWalletIsConnected = async () => {
     const { ethereum } = window;
@@ -21,10 +43,8 @@ const App = () => {
       console.log("We have the ethereum object", ethereum);
     }
 
-    // ユーザーのウォレットをリクエストします。
     const accounts = await ethereum.request({ method: "eth_accounts" });
 
-    // ユーザーが複数のアカウントを持っている場合もあります。ここでは最初のアドレスを使います。
     if (accounts.length !== 0) {
       const account = accounts[0];
       console.log("Found an authorized account:", account);
@@ -34,11 +54,15 @@ const App = () => {
     }
   };
 
-  // コネクトしていないときのレンダリング関数です。
+  // レンダリング関数です。まだ Connect されていない場合。
   const renderNotConnectedContainer = () => (
     <div className="connect-wallet-container">
       <img src={catGif} alt="Cat gif" />
-      <button className="cta-button connect-wallet-button">
+      {/* Connect Wallet ボタンが押されたときのみ connectWallet関数 を呼び出します。 */}
+      <button
+        onClick={connectWallet}
+        className="cta-button connect-wallet-button"
+      >
         Connect Wallet
       </button>
     </div>
@@ -60,7 +84,8 @@ const App = () => {
           </header>
         </div>
 
-        {renderNotConnectedContainer()}
+        {/* currentAccount が存在しない場合、Connect Wallet ボタンを表示します*/}
+        {!currentAccount && renderNotConnectedContainer()}
 
         <div className="footer-container">
           <img alt="Twitter Logo" className="twitter-logo" src={twitterLogo} />
