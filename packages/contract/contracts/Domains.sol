@@ -9,8 +9,6 @@ import {StringUtils} from "./libraries/StringUtils.sol";
 // Base64のライブラリをインポートします。
 import {Base64} from "./libraries/Base64.sol";
 
-import "hardhat/console.sol";
-
 // インポートしたコントラクトを継承します。継承したコントラクトのメソッドを使用できるようになります。
 contract Domains is ERC721URIStorage {
     // OpenZeppelinによりtokenIdsの追跡が容易になります。
@@ -26,13 +24,13 @@ contract Domains is ERC721URIStorage {
 
     mapping(string => address) public domains;
     mapping(string => string) public records;
+    mapping(uint => string) public names;
 
     address payable public owner;
 
     constructor(string memory _tld) ERC721 ("Nyanko Name Service", "NyaNS") payable {
         owner = payable(msg.sender);
         tld = _tld;
-        console.log("%s name service deployed", _tld);
     }
 
     // domainの長さにより価格が変わります。
@@ -51,7 +49,8 @@ contract Domains is ERC721URIStorage {
     }
 
     function register(string calldata name) public payable {
-        require(domains[name] == address(0));
+        if (domains[name] != address(0)) revert AlreadyRegistered();
+        if (!valid(name)) revert InvalidName(name);
 
         uint256 _price = price(name);
         require(msg.value >= _price, "Not enough Matic paid");
@@ -65,13 +64,6 @@ contract Domains is ERC721URIStorage {
         uint256 newRecordId = _tokenIds.current();
         uint256 length = StringUtils.strlen(name);
         string memory strLen = Strings.toString(length);
-
-        console.log(
-            "Registering %s.%s on the contract with tokenID %d",
-            name,
-            tld,
-            newRecordId
-        );
 
         // JSON形式のNFTのメタデータを作成。文字列を結合しbase64でエンコードします。
         string memory json = Base64.encode(
@@ -90,17 +82,11 @@ contract Domains is ERC721URIStorage {
             abi.encodePacked("data:application/json;base64,", json)
         );
 
-        console.log(
-            "\n--------------------------------------------------------"
-        );
-        console.log("Final tokenURI", finalTokenUri);
-        console.log(
-            "--------------------------------------------------------\n"
-        );
-
         _safeMint(msg.sender, newRecordId);
         _setTokenURI(newRecordId, finalTokenUri);
         domains[name] = msg.sender;
+
+        names[newRecordId] = name;
 
         _tokenIds.increment();
     }
@@ -110,8 +96,7 @@ contract Domains is ERC721URIStorage {
     }
 
     function setRecord(string calldata name, string calldata record) public {
-        // トランザクションの送信者であることを確認しています。
-        require(domains[name] == msg.sender);
+        if (msg.sender != domains[name]) revert Unauthorized();
         records[name] = record;
     }
 
@@ -136,4 +121,23 @@ contract Domains is ERC721URIStorage {
         (bool success, ) = msg.sender.call{value: amount}("");
         require(success, "Failed to withdraw Matic");
     }
+
+    function getAllNames() public view returns (string[] memory) {
+        string[] memory allNames = new string[](_tokenIds.current());
+        for (uint i = 0; i < _tokenIds.current(); i++) {
+            allNames[i] = names[i];
+        }
+
+        return allNames;
+    }
+
+    function valid(string calldata name) public pure returns (bool) {
+        return StringUtils.strlen(name) >= 3 && StringUtils.strlen(name) <= 10;
+    }
+
+    error Unauthorized();
+    error AlreadyRegistered();
+    error InvalidName(string name);
+
+
 }
