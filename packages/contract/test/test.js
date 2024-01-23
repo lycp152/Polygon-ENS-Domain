@@ -9,7 +9,7 @@ describe("ENS-Domain", () => {
     const domainContractFactory = await hre.ethers.getContractFactory(
       "Domains"
     );
-    const domainContract = await domainContractFactory.deploy("ninja");
+    const domainContract = await domainContractFactory.deploy("nyanko");
     await domainContract.deployed();
 
     let txn = await domainContract.register("abc", {
