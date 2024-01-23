@@ -14,9 +14,19 @@
     "@typechain/hardhat": "^7.0.0",
     "chai": "^4.3.7",
     "ethers": "5.4.7",
-    "hardhat": "^2.14.0",
+    "hardhat": "^2.19.4",
     "hardhat-gas-reporter": "^1.0.9",
     "solidity-coverage": "^0.8.2",
     "typechain": "^8.2.0"
+  },
+  "scripts": {
+    "run:script": "npx hardhat run scripts/run.js",
+    "deploy": "npx hardhat run scripts/deploy.js --network mumbai",
+    "test": "npx hardhat test"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.8.2",
+    "dotenv": "^16.3.2",
+    "hardhat": "^2.19.4"
   }
 }
