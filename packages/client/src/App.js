@@ -8,7 +8,7 @@ import polygonLogo from "./assets/polygonlogo.png";
 import ethLogo from "./assets/ethlogo.png";
 import { networks } from "./utils/networks";
 
-const TWITTER_HANDLE = "UNCHAIN_tech";
+const TWITTER_HANDLE = "lycp152";
 const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
 // 登録したいドメインです。好みで変えてみましょう。
 const tld = ".nyanko";
