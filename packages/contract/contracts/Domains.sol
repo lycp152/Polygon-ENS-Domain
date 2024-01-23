@@ -27,13 +27,13 @@ contract Domains is ERC721URIStorage {
     mapping(string => address) public domains;
     mapping(string => string) public records;
 
-    constructor(
-        string memory _tld
-    ) payable ERC721("Nyanko Name Service", "NyanNS") {
+    address payable public owner;
+
+    constructor(string memory _tld) ERC721 ("Nyanko Name Service", "NyaNS") payable {
+        owner = payable(msg.sender);
         tld = _tld;
         console.log("%s name service deployed", _tld);
     }
-
 
     // domainの長さにより価格が変わります。
     function price(string calldata name) public pure returns (uint) {
@@ -119,5 +119,21 @@ contract Domains is ERC721URIStorage {
         string calldata name
     ) public view returns (string memory) {
         return records[name];
+    }
+
+    modifier onlyOwner() {
+        require(isOwner(), "You aren't the owner");
+        _;
+    }
+
+    function isOwner() public view returns (bool) {
+        return msg.sender == owner;
+    }
+
+    function withdraw() public onlyOwner {
+        uint amount = address(this).balance;
+
+        (bool success, ) = msg.sender.call{value: amount}("");
+        require(success, "Failed to withdraw Matic");
     }
 }
