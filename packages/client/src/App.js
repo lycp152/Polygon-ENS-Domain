@@ -1,21 +1,19 @@
-import React from 'react';
-import './styles/App.css';
-import twitterLogo from './assets/twitter-logo.svg';
+import React from "react";
+import "./styles/App.css";
+import twitterLogo from "./assets/twitter-logo.svg";
 
 // 定数
-const TWITTER_HANDLE = 'UNCHAIN_tech';
+const TWITTER_HANDLE = "UNCHAIN_tech";
 const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
 
 const App = () => {
-
   return (
     <div className="App">
       <div className="container">
-
         <div className="header-container">
           <header>
             <div className="left">
-              <p className="title">🐱‍👤 Ninja Name Service</p>
+              <p className="title">🐱🐈 Nyanko Name Service</p>
               <p className="subtitle">Your immortal API on the blockchain!</p>
             </div>
           </header>
@@ -33,6 +31,6 @@ const App = () => {
       </div>
     </div>
   );
-}
+};
 
 export default App;

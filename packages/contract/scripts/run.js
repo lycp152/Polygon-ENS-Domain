@@ -1,17 +1,22 @@
 const main = async () => {
-  // 1つ目のアドレスは呼び出す人、2つ目のアドレスはランダムです。
-  const [owner, randomPerson] = await hre.ethers.getSigners();
   const domainContractFactory = await hre.ethers.getContractFactory("Domains");
-  const domainContract = await domainContractFactory.deploy();
+  // 'nyanko'をデプロイ時にconstructorに渡します。
+  const domainContract = await domainContractFactory.deploy("nyanko");
   await domainContract.deployed();
-  console.log("Contract deployed to:", domainContract.address);
-  console.log("Contract deployed by:", owner.address);
 
-  let txn = await domainContract.register("doom");
+  console.log("Contract deployed to:", domainContract.address);
+
+  // valueで代金をやりとりしています。
+  let txn = await domainContract.register("mortal", {
+    value: hre.ethers.utils.parseEther("0.01"),
+  });
   await txn.wait();
 
-  const domainAddress = await domainContract.getAddress("doom");
-  console.log("Owner of domain doom:", domainAddress);
+  const address = await domainContract.signer.getAddress("mortal");
+  console.log("Owner of domain mortal:", address);
+
+  const balance = await hre.ethers.provider.getBalance(domainContract.address);
+  console.log("Contract balance:", hre.ethers.utils.formatEther(balance));
 };
 
 const runMain = async () => {
